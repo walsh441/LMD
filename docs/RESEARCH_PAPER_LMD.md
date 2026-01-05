@@ -592,21 +592,87 @@ High dopamine (excitement) → faster heartbeat → more frequent ideation → m
 
 ---
 
-## 9. Limitations and Future Work
+## 9. GPU Acceleration (New in v1.2)
 
-### 9.1 Current Limitations
+### 9.1 Triton CUDA Kernels
+
+LMD v1.2 introduces GPU acceleration via custom Triton kernels for all computationally intensive operations:
+
+| Kernel | Operation | Complexity | Speedup |
+|--------|-----------|------------|---------|
+| `batch_cosine_similarity` | Pairwise similarity between embeddings | O(n²·d) | ~10x |
+| `batch_coupling` | Memory coupling matrix with valence resonance | O(n²·d) | ~8x |
+| `density_estimation` | Gaussian kernel density at query points | O(n·m·d) | ~15x |
+| `pairwise_distances` | L2 distance matrix | O(n²·d) | ~10x |
+| `void_probe_density` | k-NN density for void detection | O(n·m) | ~12x |
+| `memory_step_fused` | Fused embedding + energy + phase update | O(n·d) | ~5x |
+
+*Speedups measured vs. PyTorch CPU baseline on RTX 5080, n=100 memories, d=256 dimensions*
+
+### 9.2 Kernel Implementation
+
+The coupling kernel demonstrates the approach:
+
+```python
+@triton.jit
+def _coupling_kernel(Emb_ptr, Energy_ptr, Valence_ptr, Coupling_ptr, ...):
+    # Compute cosine similarity via tiled matrix multiply
+    cos_sim = dot / (norm_i * norm_j)
+
+    # Valence resonance: similar emotions couple more strongly
+    valence_resonance = 1.0 - 0.5 * |valence_i - valence_j|
+
+    # Combined coupling
+    coupling = strength * cos_sim * energy_i * energy_j * valence_resonance
+```
+
+### 9.3 Automatic Fallback
+
+The system automatically detects GPU availability and falls back to pure PyTorch:
+
+```python
+from lmd.cuda import is_cuda_available, get_device
+
+if is_cuda_available():
+    # Uses Triton CUDA kernels
+    from lmd.cuda import BatchCouplingComputer
+else:
+    # Falls back to PyTorch (CPU or CUDA via torch)
+    from lmd.cuda.fallback import BatchCouplingComputer
+```
+
+### 9.4 Batch Operation Classes
+
+High-level APIs for common operations:
+
+| Class | Purpose |
+|-------|---------|
+| `BatchCouplingComputer` | Coupling matrix + gradient computation |
+| `BatchDensityEstimator` | Density estimation + void finding + frontier detection |
+| `BatchMemoryStepper` | Fused memory evolution steps |
+
+### 9.5 Hardware Tested
+
+| Component | Specification |
+|-----------|--------------|
+| GPU | NVIDIA GeForce RTX 5080 |
+| VRAM | 16 GB GDDR7 |
+| CUDA Version | 13.1 |
+| Driver | 591.59 |
+| Architecture | Blackwell |
+
+---
+
+## 10. Limitations and Future Work
+
+### 10.1 Current Limitations
 
 1. **Quadratic scaling** - O(n²) limits active memory count to ~100
 2. **Toy embeddings** - 32-dim default; production would use larger (256-dim tested)
 3. **No language grounding** - Ideas are embeddings, not text
 4. **Single-level hierarchy** - Hierarchical ideas limited to depth 3-5
 
-### 9.2 Addressed in v1.2
-
-1. **GPU acceleration** - Triton CUDA kernels for all core operations (RTX 5080 tested)
-2. **Batch operations** - Parallelized coupling, density estimation, memory stepping
-
-### 9.3 Future Directions
+### 10.2 Future Directions
 
 1. **Sparse coupling** - Only couple nearby memories → O(n log n)
 2. **LLM integration** - Generate text descriptions of ideas
@@ -618,7 +684,7 @@ High dopamine (excitement) → faster heartbeat → more frequent ideation → m
 
 ---
 
-## 10. Conclusion
+## 11. Conclusion
 
 Living Memory Dynamics represents a paradigm shift from static memory stores to dynamic, living memory systems. Version 1.2 introduces Creative Leaps and GPU acceleration - advanced divergence operators that enable human-like creative jumps without LLM decoding, now with Triton CUDA kernels for high-performance operation.
 
@@ -636,9 +702,9 @@ The Joshua R. Thomas Memory Equation provides a principled foundation for memory
 
 ---
 
-## 11. Appendix: Quick Start
+## 12. Appendix: Quick Start
 
-### 11.1 Basic Ideation
+### 12.1 Basic Ideation
 
 ```python
 from lmd import (
@@ -672,7 +738,7 @@ result = engine.ideate(memories)
 print(f"Generated {len(result.ideas)} ideas, best score: {result.best_score:.3f}")
 ```
 
-### 11.2 Creative Leaps
+### 12.2 Creative Leaps
 
 ```python
 from lmd import (
@@ -716,7 +782,7 @@ print(f"Leap types used: {result.leap_types_used}")
 run_creative_ideation_demo(n_rounds=3, verbose=True)
 ```
 
-### 11.3 Autonomous Mode with Creative Leaps
+### 12.3 Autonomous Mode with Creative Leaps
 
 ```python
 # Heartbeat-driven with creative leaps
