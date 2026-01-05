@@ -26,20 +26,20 @@ from contextlib import contextmanager
 import torch
 import sys
 
-from .living_memory import LivingMemory, ValenceTrajectory
-from .config import LMDConfig
-from .dynamics import LMDDynamics
-from .imagination import (
+from lmd.living_memory import LivingMemory, ValenceTrajectory
+from lmd.config import LMDConfig
+from lmd.dynamics import LMDDynamics
+from lmd.imagination import (
     StructuredMemory, MemorySlot, SlotType, Transform, TransformType,
     TransformOps, WillGenerator, WillVector, MentalCanvas, MemoryDecomposer
 )
-from .plausibility import PlausibilityField, IdeaEvaluator
-from .ideation import IdeationEngine, IdeationConfig, IdeationResult
-from .safeguards import (
+from lmd.plausibility import PlausibilityField, IdeaEvaluator
+from lmd.ideation import IdeationEngine, IdeationConfig, IdeationResult
+from lmd.safeguards import (
     RepulsionField, RealityAnchor, AutonomyController, ResourceBudget,
     IDGenerator, safe_normalize
 )
-from .heartbeat_integration import HeartbeatIdeator
+from lmd.heartbeat_integration import HeartbeatIdeator
 
 
 @dataclass

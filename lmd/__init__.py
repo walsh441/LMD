@@ -73,12 +73,8 @@ from .heartbeat_integration import (
     HeartbeatIdeationMetrics,
     run_long_running_demo
 )
-from .benchmarks import (
-    LMDBenchmarks,
-    run_benchmarks,
-    BenchmarkSuite,
-    TimingResult
-)
+# Note: Benchmarks moved to separate benchmarks/ folder
+# from benchmarks import LMDBenchmarks, run_benchmarks, BenchmarkSuite, TimingResult
 from .creative_leaps import (
     CreativeLeapEngine,
     CreativeLeapConfig,
@@ -185,11 +181,7 @@ __all__ = [
     "HeartbeatIdeator",
     "HeartbeatIdeationMetrics",
     "run_long_running_demo",
-    # Benchmarks
-    "LMDBenchmarks",
-    "run_benchmarks",
-    "BenchmarkSuite",
-    "TimingResult",
+    # Note: Benchmarks moved to benchmarks/ folder - import from benchmarks instead
     # Creative Leaps
     "CreativeLeapEngine",
     "CreativeLeapConfig",
