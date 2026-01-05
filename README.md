@@ -1,10 +1,11 @@
 # Living Memory Dynamics (LMD)
 
-> **A Novel Framework for Narrative-Generating Episodic Memory with Creative Leaps**
+> **A Novel Framework for Narrative-Generating Episodic Memory with Creative Leaps and Language Grounding**
 
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/license-Custom-orange.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-1.3.0-green.svg)]()
 
 ## What Makes LMD Different?
 
@@ -51,18 +52,137 @@ for leap in leaps:
     print(f"{leap.leap_type}: novelty={leap.novelty:.2f}")
 ```
 
+## Language Grounding (v1.3.0)
+
+**The Problem**: LMD creates ideas as vectors - you can't read what they mean.
+
+**The Solution**: Language Grounding bridges vectors and human-readable text.
+
+```
+Text Input --> Embedding --> Creative Leap --> New Embedding --> Text Output
+"dragon"   --> [0.2, 0.8..] --> ORTHOGONAL --> [0.5, 0.3..] --> "prismatic creature"
+```
+
+### Does LMD work without Language Grounding?
+
+**Yes!** Language Grounding is **100% optional**. Core LMD works fine without it:
+- Core LMD: `pip install living-memory-dynamics` (vectors only)
+- With Language: `pip install living-memory-dynamics[language]` (text in/out)
+
+### Quick Example
+
+```python
+from lmd import create_grounding, CreativeLeapEngine
+
+# Create grounding (downloads MiniLM model ~80MB first time)
+grounding = create_grounding(encoder="minilm")
+
+# Encode text to embeddings
+dragon = grounding.encode("fire-breathing dragon")
+glass = grounding.encode("crystalline glass structure")
+
+# Build a corpus for decoding
+grounding.add_to_corpus("fire-breathing dragon")
+grounding.add_to_corpus("crystalline glass structure")
+grounding.add_to_corpus("stained glass window")
+grounding.add_to_corpus("dragon scales armor")
+
+# Blend two concepts
+blended = (dragon + glass) / 2
+blended = blended / blended.norm()
+
+# Decode back to text
+result = grounding.decode(blended, top_k=3)
+print(result.interpolated_description)
+# Output: "blend of 'crystalline glass structure' (50%) and 'fire-breathing dragon' (50%)"
+```
+
+### Generate New Ideas with Text Output
+
+```python
+# Create leap engine matching embedding dimension
+engine = CreativeLeapEngine(content_dim=grounding.embedding_dim)
+
+# Encode source concepts
+sources = [
+    grounding.encode("volcanic eruption").cpu(),
+    grounding.encode("frozen ice sculpture").cpu(),
+    grounding.encode("rainbow spectrum").cpu(),
+]
+
+# Generate creative leap
+leap = engine.leap(sources, dopamine=0.7)
+
+# Describe what was created
+description = grounding.describe_leap(
+    leap_type=leap.leap_type.name,
+    sources=sources,
+    result=leap.embedding,
+)
+print(description.synthesized_description)
+# Output: "Extrapolated beyond 'volcanic eruption' + 'frozen ice' + 'rainbow' into [novel concept]"
+print(f"Novelty: {description.novelty_score}")
+# Output: "Novelty: 1.0" (completely new!)
+```
+
+### Ground Living Memories to Readable Text
+
+```python
+from lmd import LivingMemory, ValenceTrajectory, NarrativePhase
+
+# Create a memory from text
+embedding = grounding.encode("ancient dragon guarding treasure")
+memory = LivingMemory(
+    id="memory_0",
+    content=embedding,
+    energy=0.8,
+    valence=ValenceTrajectory(points=torch.tensor([0.5, 0.7, 0.6])),
+    phase=NarrativePhase.SETUP,
+)
+
+# Later, decode what the memory represents
+grounded = grounding.ground_memory(memory)
+print(grounded.text)
+# Output: "blend of 'ancient dragon guarding treasure' (64%) and 'ancient mythical creature' (36%)"
+```
+
+### Run the Full Demo
+
+```bash
+# Install with language support
+pip install living-memory-dynamics[language]
+
+# Run the demo
+python -c "from lmd.examples import language_grounding; language_grounding.main()"
+# Or clone and run:
+git clone https://github.com/mordiaky/LMD.git
+cd LMD
+pip install -e ".[language]"
+python examples/language_grounding.py
+```
+
 ## Installation
 
 ```bash
+# Core only (vectors, no text)
 pip install living-memory-dynamics
+
+# With language grounding (text in/out)
+pip install living-memory-dynamics[language]
+
+# With GPU acceleration (Triton CUDA kernels)
+pip install living-memory-dynamics[cuda]
+
+# Everything (language + cuda + dev tools)
+pip install living-memory-dynamics[all]
 ```
 
 Or from source:
 
 ```bash
-git clone https://github.com/mordiaky/living-memory-dynamics.git
-cd living-memory-dynamics
-pip install -e .
+git clone https://github.com/mordiaky/LMD.git
+cd LMD
+pip install -e ".[language]"  # or [all] for everything
 ```
 
 ## Quick Start
@@ -133,18 +253,19 @@ result = grafter.swap_component(dragon, crystal.root, target_id="fire_component"
 
 ```
 lmd/
-├── living_memory.py      # Core LivingMemory datastructure
-├── dynamics.py           # LMDDynamics engine
-├── coupling.py           # Memory resonance fields
-├── metabolism.py         # Energy dynamics
-├── narrative.py          # Story generation
-├── imagination.py        # Mental canvas & transforms
-├── plausibility.py       # Reality grounding
-├── creative_leaps.py     # 4 creative operators
-├── hierarchical_ideas.py # Tree-structured ideas
-├── curiosity_prober.py   # Void exploration
-├── creative_ideation.py  # Unified ideation engine
-└── safeguards.py         # Repulsion, anchoring, budgets
+├── living_memory.py       # Core LivingMemory datastructure
+├── dynamics.py            # LMDDynamics engine
+├── coupling.py            # Memory resonance fields
+├── metabolism.py          # Energy dynamics
+├── narrative.py           # Story generation
+├── imagination.py         # Mental canvas & transforms
+├── plausibility.py        # Reality grounding
+├── creative_leaps.py      # 4 creative operators
+├── hierarchical_ideas.py  # Tree-structured ideas
+├── curiosity_prober.py    # Void exploration
+├── creative_ideation.py   # Unified ideation engine
+├── language_grounding.py  # Text <-> embedding bridge (v1.3.0)
+└── safeguards.py          # Repulsion, anchoring, budgets
 ```
 
 ## Benchmarks
@@ -178,10 +299,17 @@ See [RESEARCH_PAPER_LMD.md](./docs/RESEARCH_PAPER_LMD.md) for the full technical
 
 ## Examples
 
-- [Basic Usage](examples/basic_usage.py) - Create and evolve memories
-- [Creative Leaps](examples/creative_leaps.py) - Generate inventions
-- [Story Generation](examples/story_generation.py) - Emergent narratives
-- [Hierarchical Ideas](examples/hierarchical_ideas.py) - Tree-structured concepts
+```bash
+# Run any example
+python examples/<example_name>.py
+```
+
+| Example | Description | Requires |
+|---------|-------------|----------|
+| [basic_usage.py](examples/basic_usage.py) | Create and evolve memories | Core |
+| [creative_leaps.py](examples/creative_leaps.py) | Generate inventions | Core |
+| [hierarchical_ideas.py](examples/hierarchical_ideas.py) | Tree-structured concepts | Core |
+| [language_grounding.py](examples/language_grounding.py) | Text in/out with real output | `[language]` |
 
 ## License
 
@@ -198,8 +326,8 @@ If you use LMD in your research, please cite:
   author = {Thomas, Joshua R.},
   title = {Living Memory Dynamics: A Novel Framework for Narrative-Generating Episodic Memory},
   year = {2026},
-  version = {1.2.0},
-  url = {https://github.com/mordiaky/living-memory-dynamics}
+  version = {1.3.0},
+  url = {https://github.com/mordiaky/LMD}
 }
 ```
 
