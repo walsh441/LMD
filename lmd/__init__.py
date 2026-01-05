@@ -112,6 +112,18 @@ from .creative_ideation import (
     IdeaForm,
     run_creative_ideation_demo
 )
+from .language_grounding import (
+    LanguageGrounding,
+    GroundingConfig,
+    EncoderType,
+    TextCorpus,
+    GroundedText,
+    RetrievalResult,
+    CreativeLeapDescription,
+    LLMDescriber,
+    create_grounding,
+    SENTENCE_TRANSFORMERS_AVAILABLE,
+)
 
 __all__ = [
     # Core
@@ -215,6 +227,17 @@ __all__ = [
     "CreativeIdea",
     "IdeaForm",
     "run_creative_ideation_demo",
+    # Language Grounding
+    "LanguageGrounding",
+    "GroundingConfig",
+    "EncoderType",
+    "TextCorpus",
+    "GroundedText",
+    "RetrievalResult",
+    "CreativeLeapDescription",
+    "LLMDescriber",
+    "create_grounding",
+    "SENTENCE_TRANSFORMERS_AVAILABLE",
 ]
 
 # CUDA acceleration (optional)
@@ -244,4 +267,4 @@ except ImportError:
 __author__ = "Joshua R. Thomas"
 __email__ = "mordiaky@gmail.com"
 __invention_date__ = "2026-01-04"
-__version__ = "1.2.0"  # Added GPU acceleration with Triton CUDA kernels
+__version__ = "1.3.0"  # Added language grounding with sentence-transformers
