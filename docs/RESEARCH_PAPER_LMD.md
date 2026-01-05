@@ -3,7 +3,8 @@
 **Author:** Joshua R. Thomas
 **Email:** mordiaky@gmail.com
 **Date:** January 2026
-**Version:** 1.2.0
+**Version:** 1.3.0
+**PyPI:** https://pypi.org/project/living-memory-dynamics/
 
 ---
 
@@ -14,6 +15,35 @@ We present Living Memory Dynamics (LMD), a novel computational framework where m
 In version 1.1, we introduce **Creative Leaps** - advanced divergence operators that enable human-like creative jumps without LLM decoding. These include analogical transfer (cross-domain pattern transplant), manifold diffusion (walking through embedding space), orthogonal composition (Gram-Schmidt perpendicular merges), and hierarchical idea grafting (tree-structured composites with component swapping).
 
 Through rigorous benchmarks, we demonstrate that the system achieves **42.5 ideation sessions per second**, maintains **0.5% echo chamber risk**, supports **2.4M heartbeat ticks per second** for autonomous operation, and now enables **4 distinct creative leap strategies** with dopamine-modulated operator selection. The system exhibits O(n^1.98) scaling with memory count, enabling real-time operation with up to 100 concurrent living memories.
+
+---
+
+## Installation
+
+LMD is available on PyPI for easy installation:
+
+```bash
+# Core package (vectors only, no text)
+pip install living-memory-dynamics
+
+# With language grounding (text input/output)
+pip install living-memory-dynamics[language]
+
+# With GPU acceleration (Triton CUDA kernels)
+pip install living-memory-dynamics[cuda]
+
+# Everything (language + cuda + dev tools)
+pip install living-memory-dynamics[all]
+```
+
+**PyPI Package:** https://pypi.org/project/living-memory-dynamics/
+
+**From Source:**
+```bash
+git clone https://github.com/mordiaky/living-memory-dynamics.git
+cd living-memory-dynamics
+pip install -e ".[all]"
+```
 
 ---
 

@@ -2,10 +2,11 @@
 
 > **A Novel Framework for Narrative-Generating Episodic Memory with Creative Leaps and Language Grounding**
 
+[![PyPI](https://img.shields.io/badge/PyPI-living--memory--dynamics-blue.svg)](https://pypi.org/project/living-memory-dynamics/)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License](https://img.shields.io/badge/license-Custom-orange.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-1.3.0-green.svg)]()
+[![Version](https://img.shields.io/badge/version-1.3.0-green.svg)](https://pypi.org/project/living-memory-dynamics/)
 
 ## What Makes LMD Different?
 
@@ -163,6 +164,8 @@ python examples/language_grounding.py
 
 ## Installation
 
+**LMD is now available on PyPI!** 🎉
+
 ```bash
 # Core only (vectors, no text)
 pip install living-memory-dynamics
@@ -177,7 +180,9 @@ pip install living-memory-dynamics[cuda]
 pip install living-memory-dynamics[all]
 ```
 
-Or from source:
+**PyPI Package:** https://pypi.org/project/living-memory-dynamics/
+
+**Or install from source:**
 
 ```bash
 git clone https://github.com/mordiaky/LMD.git
