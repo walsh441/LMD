@@ -220,11 +220,11 @@ def demo_with_creative_leaps(grounding: LanguageGrounding):
     config = CreativeLeapConfig(content_dim=grounding.embedding_dim)
     leap_engine = CreativeLeapEngine(config)
 
-    # Encode source concepts
+    # Encode source concepts (move to CPU for leap engine compatibility)
     sources = [
-        grounding.encode("volcanic eruption"),
-        grounding.encode("frozen ice sculpture"),
-        grounding.encode("rainbow spectrum"),
+        grounding.encode("volcanic eruption").cpu(),
+        grounding.encode("frozen ice sculpture").cpu(),
+        grounding.encode("rainbow spectrum").cpu(),
     ]
 
     print("   Sources: volcanic eruption, frozen ice, rainbow spectrum")

@@ -144,8 +144,11 @@ class TextCorpus:
 
             top_k = top_k or self.config.retrieval_top_k
 
+            # Ensure query is on same device as corpus
+            query = query_embedding.to(self.embeddings.device)
+
             # Normalize for cosine similarity
-            query_norm = F.normalize(query_embedding.unsqueeze(0), p=2, dim=1)
+            query_norm = F.normalize(query.unsqueeze(0), p=2, dim=1)
             corpus_norm = F.normalize(self.embeddings, p=2, dim=1)
 
             # Compute similarities
@@ -485,13 +488,13 @@ class LanguageGrounding:
             result_str = result_decoded.interpolated_description or "[unclear]"
 
         templates = {
-            "ANALOGICAL": f"Transferred patterns from {sources_str} → {result_str}",
-            "DIFFUSION": f"Morphed through space from {sources_str} → {result_str}",
-            "ORTHOGONAL": f"Perpendicular composition of {sources_str} → {result_str}",
+            "ANALOGICAL": f"Transferred patterns from {sources_str} -> {result_str}",
+            "DIFFUSION": f"Morphed through space from {sources_str} -> {result_str}",
+            "ORTHOGONAL": f"Perpendicular composition of {sources_str} -> {result_str}",
             "EXTRAPOLATION": f"Extrapolated beyond {sources_str} into {result_str}",
         }
 
-        return templates.get(leap_type, f"{leap_type}: {sources_str} → {result_str}")
+        return templates.get(leap_type, f"{leap_type}: {sources_str} -> {result_str}")
 
     def ground_memory(self, memory: "LivingMemory") -> GroundedText:
         """Ground a LivingMemory in language.
